@@ -1,8 +1,9 @@
 import "@/global.css"
-import { styles } from "@/utils/styles"
 
 import { Text, View } from "react-native"
 import { Link } from "expo-router"
+
+import Button from "@/components/button"
 
 export default function NotFound() {
     return (
@@ -12,9 +13,9 @@ export default function NotFound() {
                     Uh oh! Page not found.
                 </Text>
 
-                <Link href="/" style={styles.button}>
-                    Go back to Home
-                </Link>
+                <Button
+                    href="/"
+                >Go back Home</Button>
             </View>
         </>
     )
