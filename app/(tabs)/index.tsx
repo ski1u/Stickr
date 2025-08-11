@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { MaterialIcons } from "@expo/vector-icons";
-import { ImageSourcePropType, Pressable, View } from "react-native";
+import * as MediaLibrary from "expo-media-library";
+import { Alert, ImageSourcePropType, Platform, Pressable, View } from "react-native";
+import { captureRef } from "react-native-view-shot";
 
 import Button from "@/components/button";
 import EmojiList from "@/components/emoji-list";
@@ -17,10 +19,20 @@ import "@/global.css";
 const placeholder_image = require("@/assets/images/background-image.png")
 
 export default function Index() {
+  const [mediaPerm, requestPerm] = MediaLibrary.usePermissions()
+  const mediaRef = useRef(null)
+
   const [image, setImage] = useState<string | undefined>(undefined)
   const [options, setOptions] = useState<boolean>(false)
   const [modal, setModal] = useState<boolean>(false)
   const [emoji, setEmoji] = useState<ImageSourcePropType | undefined>(undefined)
+  const [imageBounds, setImageBounds] = useState<{ x: number; y: number; width: number; height: number } | undefined>()
+
+  // ---
+
+  useEffect(() => { if (!mediaPerm?.granted) { requestPerm() } })
+
+  // ---
 
   const pickImage = async () => {
     let res = await ImagePicker.launchImageLibraryAsync({
@@ -30,11 +42,29 @@ export default function Index() {
 
     if (!res.canceled) { setImage(res.assets[0].uri) }
   }
-  const saveImage = async () => {}
+  const saveImage = async () => {
+    if (Platform.OS === "web") {
+      try {
+        const dataUrl = await DomToImage.toJpeg(mediaRef.current!, { quality: 1 })
+        let link = document.createElement("a")
+        link.download = "stickr.jpeg"; link.href = dataUrl; link.click()
+      } catch (e) { console.error(e) }
+    }
+
+    try {
+      if (!mediaRef.current) {
+        Alert.alert("Nothing to save", "The image area is not ready yet.")
+        return
+      }
+      const localUri = await captureRef(mediaRef, { format: "png", quality: 1 })
+      await MediaLibrary.saveToLibraryAsync(localUri)
+    } catch (e) { console.error(e) }
+    finally { Alert.alert("Saved!", "The image has been added to your photos library.") }
+  }
 
   // ---
 
-  const onReset = () => { setOptions(false) }
+  const onReset = () => { setOptions(false); setEmoji(undefined) }
   const closeModal = () => { setModal(false) }
   const onAddSticker = () => {
     setModal(true)
@@ -42,14 +72,24 @@ export default function Index() {
 
   return (
     <View className="bg-[#121212] flex-1 items-center p-12 py-20">
-      <View className="flex-1">
+      <View
+        ref={mediaRef}
+        collapsable={false}
+        className="flex-1 items-center justify-center relative">
         <ImageViewer
           className="p-6"
           src={image || placeholder_image}
+          onLayout={(e) => setImageBounds(e.nativeEvent.layout)}
         />
-        <View
-          className="flex-row justify-center items-center"
-        >{emoji && <EmojiSticker size={32} sticker={emoji} />}</View>
+        {emoji && (
+          <View
+            pointerEvents="box-none"
+            className="absolute inset-0"
+          >
+            <EmojiSticker size={64} sticker={emoji} bounds={imageBounds}
+            />
+          </View>
+        )}
       </View>
 
       {options ? (
