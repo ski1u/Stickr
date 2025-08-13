@@ -3,6 +3,7 @@ import "@/global.css"
 import React from "react"
 
 import { MaterialIcons } from "@expo/vector-icons"
+import { useColorScheme } from "nativewind"
 import { Pressable, Text } from "react-native"
 
 export default function IconButton({ children, icon, size, color, onClick } : {
@@ -12,6 +13,7 @@ export default function IconButton({ children, icon, size, color, onClick } : {
     color?: string
     onClick?: () => void
 }) {
+    const { colorScheme } = useColorScheme()
     return (
         <Pressable
             className="flex-col items-center gap-1"
@@ -20,10 +22,10 @@ export default function IconButton({ children, icon, size, color, onClick } : {
             <MaterialIcons
                 name={icon}
                 size={size || 20}
-                color={color || "#fff"}
+                color={color || (colorScheme === "dark" ? "#fff" : "#111")}
             />
             <Text
-                className="text-white text-sm"
+                className="text-sm text-black dark:text-white"
             >{children}</Text>
         </Pressable>
     )

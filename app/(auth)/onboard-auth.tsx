@@ -5,15 +5,14 @@ import { Text, View } from "react-native"
 
 export default function OnboardAuth() {
   return (
-    <View style={{ flex: 1, padding: 32 }}>
+    <View style={{ flex: 1, padding: 32 }} className="bg-white dark:bg-[#121212]">
       <View style={{ flex: 2 }} className="justify-center items-center">
         <Text
-          className="text-white font-semibold tracking-tighter"
+          className="text-black dark:text-white font-semibold tracking-tighter"
           style={{ fontSize: 28 }}
-
         >Welcome to </Text>
         <Text
-          className="text-white font-semibold tracking-tighter"
+          className="text-black dark:text-white font-semibold tracking-tighter"
           style={{ textDecorationLine: "underline", textDecorationColor: "#ffffff", fontSize: 28 }}
         >Stickr.</Text>
       </View>

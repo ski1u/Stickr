@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { MaterialIcons } from "@expo/vector-icons";
 import * as MediaLibrary from "expo-media-library";
+import { useColorScheme } from "nativewind";
 import { Alert, ImageSourcePropType, Platform, Pressable, View } from "react-native";
 import { captureRef } from "react-native-view-shot";
 
@@ -19,6 +20,7 @@ import "@/global.css";
 const placeholder_image = require("@/assets/images/background-image.png")
 
 export default function Index() {
+  const { colorScheme } = useColorScheme()
   const [mediaPerm, requestPerm] = MediaLibrary.usePermissions()
   const mediaRef = useRef(null)
 
@@ -71,7 +73,7 @@ export default function Index() {
   }
 
   return (
-    <View className="bg-[#121212] flex-1 items-center p-12 py-20">
+    <View className="flex-1 items-center p-12 py-20 bg-white dark:bg-[#121212]">
       <View
         ref={mediaRef}
         collapsable={false}
@@ -101,9 +103,9 @@ export default function Index() {
             onClick={onReset}
           >Reset</IconButton>
           <Pressable
-            className="bg-white rounded-full p-4"
+            className="rounded-full p-4 bg-black/5 dark:bg-white"
             onPress={onAddSticker}
-          ><MaterialIcons name="add" size={40} color="#000" /></Pressable>
+          ><MaterialIcons name="add" size={40} color={colorScheme === "dark" ? "#000" : "#000"} /></Pressable>
           <IconButton
             icon="save-alt"
             onClick={saveImage}
@@ -121,7 +123,6 @@ export default function Index() {
           <Button
             variant="outline"
             icon="picture-o"
-            iconColor="#ddd"
             onClick={pickImage}
           >
             {image ? "Choose another photo" : "Choose a photo"}

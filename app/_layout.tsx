@@ -1,9 +1,11 @@
 import { supabase } from "@/utils/supabase/client";
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, useFonts } from "@expo-google-fonts/inter";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Session } from "@supabase/supabase-js";
 import { Stack, useRootNavigationState, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as SystemUI from "expo-system-ui";
+import { useColorScheme } from "nativewind";
 import { useEffect, useState } from "react";
 import { Text } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -20,6 +22,7 @@ export default function RootLayout() {
   const rootNavigationState = useRootNavigationState()
   const [session, setSession] = useState<Session | null>(null)
   const [authInitialized, setAuthInitialized] = useState(false)
+  const { colorScheme, setColorScheme } = useColorScheme()
 
   useEffect(() => {
     let isMounted = true
@@ -49,7 +52,19 @@ export default function RootLayout() {
     }
   }, [session, segments, rootNavigationState?.key, authInitialized])
 
-  useEffect(() => { SystemUI.setBackgroundColorAsync("#121212").catch(() => {}) }, [])
+  useEffect(() => {
+    // load persisted theme preference
+    AsyncStorage.getItem("theme").then((stored) => {
+      if (stored === "dark" || stored === "light") {
+        setColorScheme(stored as any)
+      }
+    }).catch(() => {})
+  }, [setColorScheme])
+
+  useEffect(() => {
+    const bg = colorScheme === "dark" ? "#121212" : "#ffffff"
+    SystemUI.setBackgroundColorAsync(bg).catch(() => {})
+  }, [colorScheme])
 
   if (!fontsLoaded) {
     return null
@@ -62,16 +77,22 @@ export default function RootLayout() {
   ]
 
   return (
-    <GestureHandlerRootView className="flex-1" style={{ backgroundColor: "#121212" }}>
-      <StatusBar style="light" />
-      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: "#121212" } }}>
+    <GestureHandlerRootView className="flex-1 bg-white dark:bg-[#121212]">
+      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+      <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen
           name="(tabs)"
           options={{
             headerShown: false
           }}
         />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen 
+          name="(auth)" 
+          options={{ 
+            headerShown: false,
+            contentStyle: { backgroundColor: colorScheme === "dark" ? "#121212" : "#ffffff" }
+          }} 
+        />
         <Stack.Screen name="+not-found" options={{ headerShown: false }} />
       </Stack>
     </GestureHandlerRootView>

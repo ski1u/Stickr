@@ -1,11 +1,7 @@
-import { Text, View } from "react-native"
+import Auth from "@/components/auth"
 
 export default function SignUp() {
-  return (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <Text>Sign Up</Text>
-    </View>
-  )
+  return <Auth type="sign-up" />
 }
 
 
