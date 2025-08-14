@@ -1,5 +1,9 @@
-### Future Implementations:
-- AsyncStorage or Context API-> user preferences, app state
-- Animations -> react-native-reanimated or Lottie
-- Notifications
-- Image Optimization -> Lazy loading
+## A small app, meant for me to learn the basics and fundamentals of Expo & React Native
+- React Native Components (View, TextInput, ...)
+- Layout Stacks & Tabs
+- RN Animated
+- Color Scheme Theming
+- Nativewind & StyleSheets
+- Modal
+- Gestures
+- Notifications, Photo Library, & Permissions

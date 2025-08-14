@@ -7,7 +7,19 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useRouter } from "expo-router"
 import { useColorScheme } from "nativewind"
 import { useCallback, useEffect, useState } from "react"
-import { ActivityIndicator, Switch, Text, View } from "react-native"
+import { ActivityIndicator, Alert, Switch, Text, View } from "react-native"
+import * as Notifications from 'expo-notifications';
+import * as Permissions from 'expo-permissions';
+import Button from "@/components/button"
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false
+    })
+})
 
 export default function Settings() {
     const router = useRouter()
@@ -43,6 +55,19 @@ export default function Settings() {
         }
     }, [router])
 
+    const requestNotif = async () => {
+        const { status } = await Notifications.requestPermissionsAsync()
+        if (status !== "granted") { Alert.alert("Notifications", "Permission for notifications not granted") }
+    }; const scheduleNotif = async () => {
+        await Notifications.scheduleNotificationAsync({
+            content: {
+                title: "Hello from Stickr!",
+                body: "This is a notification test"
+            },
+            trigger: { seconds: 5, repeats: false, type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL }
+        })
+    }
+
     return (
         <View className="flex-1 px-6 py-32 gap-8 bg-white dark:bg-[#121212]">
             <SettingsSection title="APP SETTINGS">
@@ -68,6 +93,20 @@ export default function Settings() {
                 </SettingsRow>
                 <SettingsRow destructive onPress={handleSignOut} bordered={false} right={signingOut ? <ActivityIndicator size="small" color="#666" /> : null}>
                     Sign Out
+                </SettingsRow>
+            </SettingsSection>
+
+            <SettingsSection title="NOTIFICATIONS">
+                <SettingsRow
+                    onPress={requestNotif}
+                    right={
+                        <Button
+                            className="w-1/3 z-50"
+                            onClick={scheduleNotif}
+                        >Test</Button>
+                    }
+                >
+                    Enable Notifications
                 </SettingsRow>
             </SettingsSection>
         </View>
